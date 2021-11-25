@@ -1,0 +1,52 @@
+services:
+    rabbitmq:
+        image: "rabbitmq:3-management-alpine"
+        ports:
+            - 5672:5672
+            - 15672:15672
+        healthcheck:
+            test: ["CMD", "rabbitmq-diagnostics", "-q", "status"]
+            interval: 10s
+            timeout: 10s
+            retries: 5
+    postgres:
+        image: "postgres:13-alpine"
+        environment:
+            - POSTGRES_PASSWORD
+        ports:
+            - 5432:5432
+        volumes:
+            - ./init/database.sql:/docker-entrypoint-initdb.d/database.sql
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 10s
+            retries: 5
+    backend:
+        container_name: microservices_backend
+        build:
+            context: .
+            dockerfile: backend.Dockerfile
+        env_file:
+            - .env
+        stdin_open: true
+        tty: true
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+    database:
+        container_name: microservices_database
+        build:
+            context: .
+            dockerfile: database.Dockerfile
+        env_file:
+            - .env
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+            postgres:
+                condition: service_healthy
+
+networks:
+    default:
+        name: messengers_ms_network
