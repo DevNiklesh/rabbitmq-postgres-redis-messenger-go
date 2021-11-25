@@ -66,7 +66,7 @@ func publishInput(c *rabbit.Conn) {
 			log.Fatalf("marshal message: %s", err)
 		}
 
-		key := conf.KeyBack + "." + conf.KeyDB
+		key := conf.KeyBack + "." + conf.KeyDB + "." + conf.KeyCache
 		err = c.Publish(conf.Exchange, key, message)
 		if err != nil {
 			log.Fatalf("publish message: %s", err)

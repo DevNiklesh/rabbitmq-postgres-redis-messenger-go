@@ -33,6 +33,6 @@ docker run -it --rm \
     postgres:13-alpine \
     psql -h postgres -U postgres -d messenger
 ```
-```bash
+```sql
 SELECT * FROM messages;
 ```
