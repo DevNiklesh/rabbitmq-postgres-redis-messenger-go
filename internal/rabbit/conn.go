@@ -21,6 +21,9 @@ func GetConn(rabbitUrl string) (*Conn, error) {
 	}
 
 	ch, err := conn.Channel()
+	if err != nil {
+		return &Conn{}, err
+	}
 	return &Conn{
 		Connection: conn,
 		Channel:    ch,
